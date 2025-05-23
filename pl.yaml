@@ -1,0 +1,5 @@
+names:
+- wheat_head
+nc: 1
+train: datasets/2021_pl/images/train
+val: datasets/2021_pl/images/val
