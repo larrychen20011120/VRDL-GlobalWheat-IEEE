@@ -53,6 +53,7 @@ We extend 2020 dataset with more diverse wheat data from 2021 dataset. It repres
     ├── pl.yaml
     ├── README.md
     ├── *.py
+    ├── tools/
     ```
 
 - Run the following scripts to transform the dataset format to YOLO format
@@ -81,6 +82,23 @@ In the 2021 dataset paper, it demonstrates that the test dataset was biased in c
 ```
 python pseudo_labeling.py
 ```
+
+### Find Best Confidence Threshold
+
+A helper script is included to scan different confidence thresholds on your validation set and find the one that yields the highest mAP@[0.5:0.75].
+
+1. **Run the script**:
+    ```bash
+    python tools/find_best_confidence.py
+    ```
+    This will:
+    - Load `VDL_best.pt`
+    - Evaluate on the validation split at image size 1024, batch size 36, using 18 workers
+    - Sweep confidence from 0.10 to 0.30 in 20 steps
+    - Print out AP@[0.5:0.75] for each confidence and report the best threshold at the end.
+
+2. **(Optional)** If you want to adjust the range, step count, or data path, edit the `conf_list` or file paths at the top of `tools/find_best_confidence.py`.
+
 
 ### Reproduce of the Top-Rank Methods
 
