@@ -5,3 +5,4 @@ GlobalWheatTestSet
 gwhd_2021
 *.zip
 *.pt
+venv/
