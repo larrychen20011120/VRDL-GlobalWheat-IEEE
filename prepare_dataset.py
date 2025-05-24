@@ -13,7 +13,7 @@ def yolo_bbox(size, bbox):
     cy = (y + h / 2) / H
     return cx, cy, w / W, h / H
 
-def main(csv_path, img_dir, out_dir, csv_path2="empty", img_dir2="train/train", folds=5, seed=42):
+def main(csv_path, img_dir, out_dir, folds=5, seed=42):
     df = pd.read_csv(csv_path)
     grp = df.groupby("image_id")
 
@@ -59,9 +59,9 @@ def main(csv_path, img_dir, out_dir, csv_path2="empty", img_dir2="train/train", 
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
-    p.add_argument("--csv", default="train.csv")
-    p.add_argument("--img_dir", default="train")
-    p.add_argument("--out_dir", default="datasets/wheat_yolo")
+    p.add_argument("--csv", default="gwhd_2020/train.csv")
+    p.add_argument("--img_dir", default="gwhd_2020/train")
+    p.add_argument("--out_dir", default="datasets/2020")
     p.add_argument("--folds", type=int, default=5)
     args = p.parse_args()
     main(args.csv, args.img_dir, args.out_dir, args.csv2, args.img_dir2, args.folds)
