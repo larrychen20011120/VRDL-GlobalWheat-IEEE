@@ -61,6 +61,9 @@ if __name__ == "__main__":
     WEIGHT_FILE = "runs/yolov8_wheat_2021/weights/best.pt"
     SRC = "datasets/2021"
     DEST = "datasets/2021_pl"
+
+    # copy the orinal dataset to pseudo labeling dataset
+    os.system(f"cp -r {SRC} {DEST}")
     
     model    = YOLO(WEIGHT_FILE)
     device = "cuda" if torch.cuda.is_available() else "cpu"

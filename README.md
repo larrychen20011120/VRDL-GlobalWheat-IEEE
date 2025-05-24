@@ -105,4 +105,4 @@ A helper script is included to scan different confidence thresholds on your vali
 
 ## Reference and Technical Supports
 1. [Global Wheat Head Dataset 2021: more diversity to improve the benchmarking of wheat head localization methods](https://arxiv.org/abs/2105.07660)
-2. [Ultralytics Librart](https://github.com/ultralytics/ultralytics)
+2. [Ultralytics Library](https://github.com/ultralytics/ultralytics)
