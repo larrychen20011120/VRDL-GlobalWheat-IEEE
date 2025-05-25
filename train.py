@@ -4,7 +4,6 @@
 YOLOv8-X 1024×1024 微調小麥偵測
 """
 from ultralytics import YOLO
-from ultralytics.utils import DEFAULT_CFG
 
 
 if __name__ == "__main__":

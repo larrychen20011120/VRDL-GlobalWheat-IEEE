@@ -1,20 +1,24 @@
-import os, glob, torch, numpy as np, pandas as pd
-import argparse, os, json, shutil, random
-from ultralytics import YOLO
+import os
+import glob
+import torch
+import shutil
+import numpy as np
 from tqdm.auto import tqdm
+from ultralytics import YOLO
 from prepare_dataset import yolo_bbox
+
 
 def makePseudolabel(model, dest, CONF_TH=0.5, IOU_TH=0.6, TTA=True):
     # Inference for Global Wheat Detection – fixed bbox + tuneable threshold
-    
-    IMGSZ   = 1024
-    BATCH   = 8
+
+    IMGSZ = 1024
+    BATCH = 8
 
     # 03 inference
     TEST_DIR = "GlobalWheatTestSet"
-            
+
     test_imgs = sorted(glob.glob(f"{TEST_DIR}/**/*.png"))
-    
+
     for i in tqdm(range(0, len(test_imgs), BATCH)):
         paths = test_imgs[i:i+BATCH]
         preds = model.predict(
@@ -27,31 +31,32 @@ def makePseudolabel(model, dest, CONF_TH=0.5, IOU_TH=0.6, TTA=True):
             verbose=False,
             augment=TTA,
         )
-        
+
         for res in preds:
             img_id = os.path.basename(res.path).split('.')[0]
-            xyxy   = res.boxes.xyxy.cpu().numpy()      # (x1, y1, x2, y2)
+            xyxy = res.boxes.xyxy.cpu().numpy()      # (x1, y1, x2, y2)
             scores = res.boxes.conf.cpu().numpy()
-    
+
             if len(xyxy):
                 h_img, w_img = res.orig_shape
                 xyxy[:, [0, 2]] = np.clip(xyxy[:, [0, 2]], 0, w_img - 1)
                 xyxy[:, [1, 3]] = np.clip(xyxy[:, [1, 3]], 0, h_img - 1)
-                w_h   = xyxy[:, 2:] - xyxy[:, :2]       # w = x2-x1, h = y2-y1
-                xywh  = np.hstack([xyxy[:, :2], w_h])   # (x, y, w, h)
+                w_h = xyxy[:, 2:] - xyxy[:, :2]       # w = x2-x1, h = y2-y1
+                xywh = np.hstack([xyxy[:, :2], w_h])   # (x, y, w, h)
 
                 img_file = f"{img_id}.png"
                 shutil.copyfile(
-                    res.path, 
+                    res.path,
                     f"{dest}/images/train/{img_file}"
                 )
 
                 with open(f"{dest}/labels/train/{img_id}.txt", "w") as f:
-                
+
                     for (x, y, w, h), s in zip(xywh, scores):
 
                         if w > 0 and h > 0:
-                            cx, cy, bw, bh = yolo_bbox((w_img, h_img), (x, y, w, h))
+                            cx, cy, bw, bh = yolo_bbox(
+                                (w_img, h_img), (x, y, w, h))
                             f.write(f"0 {cx:.6f} {cy:.6f} {bw:.6f} {bh:.6f}\n")
 
 
@@ -64,12 +69,12 @@ if __name__ == "__main__":
 
     # copy the orinal dataset to pseudo labeling dataset
     os.system(f"cp -r {SRC} {DEST}")
-    
-    model    = YOLO(WEIGHT_FILE)
+
+    model = YOLO(WEIGHT_FILE)
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model.fuse()
     model.to(device).eval()
-    
+
     # # generate pseudo labels
     makePseudolabel(model, DEST, CONF_TH=0.5, IOU_TH=0.5, TTA=True)
 
@@ -78,14 +83,14 @@ if __name__ == "__main__":
     print("valid size / origin:", len(os.listdir(f"{SRC}/images/val")))
     print("train size / withpl:", len(os.listdir(f"{DEST}/images/train")))
     print("valid size / withpl:", len(os.listdir(f"{DEST}/images/val")))
-    
+
     EPOCHS = 10
     # continual training
     results = model.train(
         data="pl.yaml",
         epochs=EPOCHS,
         imgsz=1024,
-        batch=8,           
+        batch=8,
         device=0,
         optimizer="AdamW",
         lr0=5e-4,
@@ -93,8 +98,8 @@ if __name__ == "__main__":
         warmup_epochs=2,
         weight_decay=1e-4,
         close_mosaic=EPOCHS,   # Pseodo Labeling does not need mosaic
-        patience=20,       
-        workers=8,         
+        patience=20,
+        workers=8,
         #### Add Augmentation ###
         hsv_h=0.2,
         hsv_s=0.2,

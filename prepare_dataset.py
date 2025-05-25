@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import argparse, os, json, shutil, random
+import argparse
+import os
+import json
+import shutil
 import pandas as pd
 from tqdm import tqdm
 from sklearn.model_selection import StratifiedKFold
+
 
 def yolo_bbox(size, bbox):
     W, H = size
@@ -12,6 +16,7 @@ def yolo_bbox(size, bbox):
     cx = (x + w / 2) / W
     cy = (y + h / 2) / H
     return cx, cy, w / W, h / H
+
 
 def main(csv_path, img_dir, out_dir, folds=5, seed=42):
     df = pd.read_csv(csv_path)
@@ -33,7 +38,8 @@ def main(csv_path, img_dir, out_dir, folds=5, seed=42):
     for img_id, g in tqdm(grp, desc="轉換標註"):
         split = "val" if img_id in val_set else "train"
         img_file = f"{img_id}.jpg"
-        shutil.copyfile(f"{img_dir}/{img_file}", f"{out_dir}/images/{split}/{img_file}")
+        shutil.copyfile(f"{img_dir}/{img_file}",
+                        f"{out_dir}/images/{split}/{img_file}")
 
         with open(f"{out_dir}/labels/{split}/{img_id}.txt", "w") as f:
             for _, row in g.iterrows():
@@ -41,7 +47,6 @@ def main(csv_path, img_dir, out_dir, folds=5, seed=42):
                 w, h = row["width"], row["height"]
                 cx, cy, bw, bh = yolo_bbox((w, h), bbox)
                 f.write(f"0 {cx:.6f} {cy:.6f} {bw:.6f} {bh:.6f}\n")
-        
 
     # 產生 YAML
     yaml_dict = {
@@ -57,6 +62,7 @@ def main(csv_path, img_dir, out_dir, folds=5, seed=42):
         pyaml.dump(yaml_dict, f)
     print("✅ wheat.yaml created")
 
+
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("--csv", default="gwhd_2020/train.csv")
@@ -64,4 +70,5 @@ if __name__ == "__main__":
     p.add_argument("--out_dir", default="datasets/2020")
     p.add_argument("--folds", type=int, default=5)
     args = p.parse_args()
-    main(args.csv, args.img_dir, args.out_dir, args.csv2, args.img_dir2, args.folds)
+    main(args.csv, args.img_dir, args.out_dir,
+         args.csv2, args.img_dir2, args.folds)

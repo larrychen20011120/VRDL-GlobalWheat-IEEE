@@ -1,15 +1,16 @@
-import argparse, os, json, shutil, random
+import os
+import shutil
 import pandas as pd
 from tqdm import tqdm
 from sklearn.model_selection import StratifiedKFold
 
+
 def main(folds=5, seed=42):
-    
+
     df1 = pd.read_csv("gwhd_2021/competition_train.csv")
     df2 = pd.read_csv("gwhd_2021/competition_val.csv")
 
     df = pd.concat([df1, df2], ignore_index=True)
-
 
     # 建立資料夾
     for split in ["train", "val"]:
@@ -18,7 +19,6 @@ def main(folds=5, seed=42):
     X = df["image_name"]
     y = df["domain"]
 
-    
     skf = StratifiedKFold(n_splits=folds, shuffle=True, random_state=seed)
 
     for fold, (train_idx, val_idx) in enumerate(skf.split(X, y)):
@@ -32,19 +32,19 @@ def main(folds=5, seed=42):
         for filename, label in tqdm(zip(filenames, labels), total=len(filenames)):
             image_id = filename.split(".")[0]
             boxes = label.split(";")
-            shutil.copyfile(f"gwhd_2021/images/{filename}", f"datasets/2021/images/train/{filename}")
+            shutil.copyfile(
+                f"gwhd_2021/images/{filename}", f"datasets/2021/images/train/{filename}")
 
             IMAGE_WIDTH = 1024
             IMAGE_HEIGHT = 1024
 
             def convert_box(xmin, ymin, xmax, ymax):
-                
+
                 x_center = (xmin + xmax) / 2 / IMAGE_WIDTH
                 y_center = (ymin + ymax) / 2 / IMAGE_HEIGHT
                 width = (xmax - xmin) / IMAGE_WIDTH
                 height = (ymax - ymin) / IMAGE_HEIGHT
                 return x_center, y_center, width, height
-            
 
             with open(f"datasets/2021/labels/train/{image_id}.txt", "w") as f:
                 if boxes[0] != "no_box":
@@ -59,7 +59,8 @@ def main(folds=5, seed=42):
         for filename, label in tqdm(zip(filenames, labels), total=len(filenames)):
             image_id = filename.split(".")[0]
             boxes = label.split(";")
-            shutil.copyfile(f"gwhd_2021/images/{filename}", f"datasets/2021/images/val/{filename}")
+            shutil.copyfile(
+                f"gwhd_2021/images/{filename}", f"datasets/2021/images/val/{filename}")
 
             with open(f"datasets/2021/labels/val/{image_id}.txt", "w") as f:
                 if boxes[0] != "no_box":
@@ -77,10 +78,11 @@ def main(folds=5, seed=42):
     }
 
     import yaml as pyaml
-    
+
     with open(f"./wheat_2021.yaml", "w") as f:
         pyaml.dump(yaml_dict, f)
     print("✅ wheat_2021.yaml created.")
+
 
 if __name__ == "__main__":
     main()
