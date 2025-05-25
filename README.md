@@ -109,6 +109,9 @@ The following is our **performance snapshot** on the kaggle platform.
 ![](/asset/performance.png)
 
 ### Reproduce of the Top-Rank Methods
+1. [Notebook for Reproducing the 1st Place Solution](https://www.kaggle.com/code/dcongtinh/vrdl-ieee-gwd2020)
+2. [Notebook for Reproducing the 2nd Place Solution](https://www.kaggle.com/code/minhthaophannguyen/vrdl-ieee-2025)
+
 
 
 ## Reference and Technical Supports
