@@ -99,6 +99,8 @@ A helper script is included to scan different confidence thresholds on your vali
 
 2. **(Optional)** If you want to adjust the range, step count, or data path, edit the `conf_list` or file paths at the top of `tools/find_best_confidence.py`.
 
+#### Submission
+For submitting to the leaderboard, you can follow [this notebook](https://www.kaggle.com/code/larrychen1120/yolov8x-submission) and upload your best model weights to the kaggle platform.
 
 ### Reproduce of the Top-Rank Methods
 
