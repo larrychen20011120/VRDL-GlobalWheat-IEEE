@@ -83,7 +83,7 @@ In the 2021 dataset paper, it demonstrates that the test dataset was biased in c
 python pseudo_labeling.py
 ```
 
-### Find Best Confidence Threshold
+#### Find Best Confidence Threshold
 
 A helper script is included to scan different confidence thresholds on your validation set and find the one that yields the highest mAP@[0.5:0.75].
 
@@ -101,6 +101,12 @@ A helper script is included to scan different confidence thresholds on your vali
 
 #### Submission
 For submitting to the leaderboard, you can follow [this notebook](https://www.kaggle.com/code/larrychen1120/yolov8x-submission) and upload your best model weights to the kaggle platform.
+
+<hr>
+
+The following is our **performance snapshot** on the kaggle platform.
+
+![](/asset/performance.png)
 
 ### Reproduce of the Top-Rank Methods
 
